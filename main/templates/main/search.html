@@ -1,0 +1,223 @@
+{% extends "main/base.html" %}
+{% block content %}
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+  :root {
+    --matrix-green: #0f0;
+    --matrix-green-dim: #00aa00;
+    --bg-dark: #000;
+    --text-dim: #003300;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg-dark);
+    color: var(--matrix-green);
+    font-family: 'VT323', monospace;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    image-rendering: pixelated;
+  }
+
+  /* Scanlines + subtle CRT flicker */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      rgba(0,0,0,0.08) 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    animation: flicker 8s infinite alternate;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 0.12; }
+    50%      { opacity: 0.18; }
+  }
+
+  /* Glitch effect on hover */
+  .glitch-hover:hover {
+    animation: glitch 0.4s infinite;
+  }
+
+  @keyframes glitch {
+    0%   { text-shadow: 2px 0 #f00, -2px 0 #0ff; }
+    20%  { text-shadow: -2px 0 #f00, 2px 0 #0ff; }
+    40%  { text-shadow: 2px 0 #f00, -2px 0 #0ff; }
+    60%  { text-shadow: -4px 0 #f00, 4px 0 #0ff; }
+    80%  { text-shadow: 4px 0 #f00, -4px 0 #0ff; }
+    100% { text-shadow: 2px 0 #f00, -2px 0 #0ff; }
+  }
+
+  .terminal-window {
+    background: rgba(0,0,0,0.85);
+    border: 2px solid var(--matrix-green-dim);
+    box-shadow: 0 0 30px rgba(0,255,0,0.15);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .terminal-header {
+    background: #001100;
+    border-bottom: 2px solid var(--matrix-green-dim);
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+
+  .terminal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    position: relative;
+  }
+
+  .terminal-input-area {
+    border-top: 2px solid var(--matrix-green-dim);
+    padding: 0.8rem 1.5rem;
+    background: #000811;
+  }
+
+  .message {
+    margin: 0.8rem 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .prompt {
+    color: var(--matrix-green);
+  }
+
+  .user-msg {
+    color: #55ff55;
+  }
+
+  .ai-msg {
+    color: #00cc99;
+  }
+
+  input, button {
+    font-family: 'VT323', monospace;
+    font-size: 1.25rem;
+    background: transparent;
+    border: none;
+    color: var(--matrix-green);
+    outline: none;
+  }
+
+  input::placeholder {
+    color: var(--matrix-green-dim);
+  }
+
+  button {
+    cursor: pointer;
+    padding: 0 0.8rem;
+    transition: color 0.2s;
+  }
+
+  button:hover {
+    color: #00ffaa;
+  }
+
+  .blinking-cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>
+
+<div class="terminal-window">
+
+  <!-- Header / status bar -->
+  <div class="terminal-header">
+    <div>
+      <span class="text-[#00aa00]">root@darknode</span>:<span class="text-[#55ff55]">~/grok-chat</span>#
+    </div>
+    <div class="text-[#00aa00] text-sm">
+      ACCESS_LEVEL: {{ request.user.username|default:"GUEST" }} • 
+      {% if request.user.is_authenticated %}
+        SECURED
+      {% else %}
+        MONITORED
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Messages area -->
+  <div class="terminal-body" id="chatScroll">
+
+    {% for chat in chats reversed %}
+      <div class="message user-msg">
+        <span class="prompt">user@darknode:~$ </span>{{ chat.message }}
+      </div>
+
+      <div class="message ai-msg">
+        <span class="prompt">grok@matrix:~$ </span>{{ chat.response|linebreaksbr|safe }}
+      </div>
+    {% endfor %}
+
+    <!-- Typing indicator -->
+    <div id="typing" class="message ai-msg hidden">
+      <span class="prompt">grok@matrix:~$ </span>processing... <span class="blinking-cursor">_</span>
+    </div>
+
+    <!-- Spacer so last message isn't covered -->
+    <div class="h-24"></div>
+
+  </div>
+
+  <!-- Input line -->
+  <div class="terminal-input-area">
+    <form method="POST" class="flex items-center gap-2" onsubmit="showTyping();">
+      {% csrf_token %}
+      <span class="prompt user-msg">user@darknode:~$</span>
+      <input 
+        type="text" 
+        name="query" 
+        placeholder="enter command..." 
+        autocomplete="off"
+        required
+        class="flex-1"
+      >
+      <button type="submit">[EXECUTE]</button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+// Auto-scroll to bottom
+function scrollToBottom() {
+  const scroll = document.getElementById("chatScroll");
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function showTyping() {
+  document.getElementById("typing").classList.remove("hidden");
+  setTimeout(scrollToBottom, 80);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(scrollToBottom, 300);
+});
+
+window.addEventListener('resize', scrollToBottom);
+</script>
+
+{% endblock %}
