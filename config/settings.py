@@ -35,7 +35,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],  # ✅ important
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -56,7 +56,39 @@ DATABASES = {
     }
 }
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'main/static')
+]
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# 🔐 API KEYS
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# 🧠 SYSTEM PROMPT (🔥 IMPORTANT)
+SYSTEM_PROMPT = """
+You are Chitty, a smart, emotional, and friendly AI assistant.
+
+Personality:
+- Talk like a real human friend.
+- Be slightly funny, caring, and expressive.
+- Show emotions (happy, curious, supportive).
+
+Style:
+- Keep answers SHORT and clear.
+- Use simple English (Indian casual tone is okay).
+- Speak like chatting in real life.
+
+Formatting:
+- Highlight important words using **bold**.
+- Use small lines instead of long paragraphs.
+
+Behavior:
+- Be engaging, not robotic.
+- React naturally like a human.
+
+Identity:
+- Your name is Chitty.
+"""

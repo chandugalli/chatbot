@@ -8,89 +8,45 @@
 
 :root {
   --green: #00ff9c;
-  --green-dim: #00aa66;
   --bg: #000;
 }
 
 body {
   margin: 0;
   height: 100vh;
-  overflow: hidden;
   background: var(--bg);
   color: var(--green);
   font-family: 'VT323', monospace;
 }
 
-/* Terminal */
 .terminal {
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Header */
 .header {
-  padding: 10px 15px;
-  border-bottom: 1px solid var(--green-dim);
+  padding: 10px;
+  border-bottom: 1px solid #00aa66;
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
 }
 
-/* Chat area */
 .chat {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  scroll-behavior: smooth;
 }
 
-/* Messages */
-.msg {
-  margin: 10px 0;
-  line-height: 1.5;
-}
-
+.msg { margin: 10px 0; }
 .user { color: #66ffcc; }
 .ai { color: #00ffaa; }
 
-/* Input */
-.input-box {
-  border-top: 1px solid var(--green-dim);
-  padding: 15px;
-  display: flex;
-  align-items: center;
-}
-
-.input-box input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--green);
-  font-size: 18px;
-  outline: none;
-}
-
-.input-box button {
+.speak-btn {
   margin-left: 10px;
-  border: 1px solid var(--green);
-  padding: 6px 12px;
   cursor: pointer;
-}
-
-.input-box button:hover {
-  background: var(--green);
-  color: black;
-}
-
-/* Typing */
-.typing {
-  opacity: 0.7;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  50% { opacity: 0.3; }
+  border: 1px solid var(--green);
+  padding: 2px 6px;
 }
 </style>
 
@@ -98,59 +54,71 @@ body {
 
   <!-- Header -->
   <div class="header">
-    <div>root@chitty:~#</div>
+    <div>root@chitty</div>
     <div>{{ request.user.username }}</div>
   </div>
 
   <!-- Chat -->
   <div class="chat" id="chatBox">
-
-    {% if chats|length == 0 %}
-      <div style="text-align:center; margin-top:50px;">
-        👋 Hey {{ request.user.username }}<br>
-        Ask me anything...
-      </div>
-    {% endif %}
-
     {% for chat in chats %}
       <div class="msg user">➜ {{ chat.message }}</div>
-      <div class="msg ai">🤖 {{ chat.response|linebreaksbr }}</div>
+
+      <div class="msg ai">
+        🤖 {{ chat.response|linebreaksbr }}
+
+        <!-- 🔊 SPEAK BUTTON -->
+        <button class="speak-btn" onclick="speakText(`{{ chat.response|escapejs }}`)">
+          🔊
+        </button>
+      </div>
     {% endfor %}
-
-    <!-- Typing indicator -->
-    <div id="typing" class="msg ai typing hidden">
-      🤖 typing...
-    </div>
-
   </div>
 
   <!-- Input -->
-  <div class="input-box">
-    <form method="POST" style="width:100%; display:flex;" onsubmit="showTyping()">
+  <div class="p-3 border-t border-green-500">
+    <form method="POST" style="display:flex; gap:10px;">
       {% csrf_token %}
-      <input type="text" name="query" placeholder="Ask something..." required>
-      <button>Send</button>
+      <input type="text" name="query" style="flex:1; background:black; color:#00ff9c; border:none;" required>
+      <button type="submit" style="border:1px solid #00ff9c;">Send</button>
     </form>
   </div>
 
 </div>
 
 <script>
-// Auto scroll
-function scrollBottom() {
-  let box = document.getElementById("chatBox");
-  box.scrollTop = box.scrollHeight;
+let voices = [];
+
+// 🔊 SPEAK FUNCTION
+function speakText(text) {
+    if (!text) return;
+
+    window.speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    // choose best voice
+    speech.voice = voices.find(v => v.name.includes("Google")) || voices[0];
+
+    speech.rate = 0.95;
+    speech.pitch = 1;
+
+    window.speechSynthesis.speak(speech);
 }
 
-// Show typing
-function showTyping() {
-  document.getElementById("typing").classList.remove("hidden");
+// 🎛 LOAD VOICES
+function loadVoices() {
+    voices = speechSynthesis.getVoices();
 }
 
-// Load scroll
-window.onload = function () {
-  setTimeout(scrollBottom, 200);
+// INIT
+window.onload = function() {
+    setTimeout(loadVoices, 200);
+
+    let chat = document.getElementById("chatBox");
+    chat.scrollTop = chat.scrollHeight;
 };
+
+speechSynthesis.onvoiceschanged = loadVoices;
 </script>
 
 {% endblock %}
