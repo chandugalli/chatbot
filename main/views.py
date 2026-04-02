@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+import requests
+import os
 
 # temporary chat storage
 chat_history = []
@@ -32,13 +34,11 @@ def register_page(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # check if user already exists
         if User.objects.filter(username=username).exists():
             return render(request, 'main/register.html', {
                 "error": "Username already exists"
             })
 
-        # create new user
         user = User.objects.create_user(username=username, password=password)
         user.save()
 
@@ -47,7 +47,7 @@ def register_page(request):
     return render(request, 'main/register.html')
 
 
-# ✅ CHAT / SEARCH PAGE
+# ✅ CHAT / SEARCH PAGE (GROQ AI 🔥)
 @login_required
 def search_page(request):
     global chat_history
@@ -55,8 +55,33 @@ def search_page(request):
     if request.method == "POST":
         user_input = request.POST.get('query')
 
-        # dummy AI response (you can replace with OpenAI later)
-        ai_response = f"You said: {user_input}"
+        try:
+            api_key = os.getenv("GROQ_API_KEY")
+
+            response = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "llama3-70b-8192",
+                    "messages": [
+                        {"role": "user", "content": user_input}
+                    ]
+                }
+            )
+
+            data = response.json()
+
+            # Debug (optional)
+            if "choices" not in data:
+                ai_response = f"API Error: {data}"
+            else:
+                ai_response = data["choices"][0]["message"]["content"]
+
+        except Exception as e:
+            ai_response = f"Error: {str(e)}"
 
         chat_history.append({
             "message": user_input,
