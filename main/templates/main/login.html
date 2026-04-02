@@ -1,25 +1,256 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Terminal Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020703;
+      --panel: #071108;
+      --panel-2: #0b1a0c;
+      --line: #1b3d20;
+      --text: #7aff95;
+      --text-soft: #47d56e;
+      --danger: #ff7a7a;
+      --radius: 12px;
+      --glow: 0 0 18px rgba(78, 255, 128, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Share Tech Mono", monospace;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 0%, #0a1a0c 0%, transparent 35%),
+                  radial-gradient(circle at 85% 20%, #08210a 0%, transparent 40%),
+                  var(--bg);
+    }
+
+    .screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: min(460px, 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(160deg, rgba(8, 20, 10, 0.96), rgba(4, 12, 6, 0.96));
+      box-shadow: inset 0 0 0 1px rgba(80, 220, 116, 0.1), var(--glow);
+      overflow: hidden;
+    }
+
+    .head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(12, 30, 14, 0.5);
+    }
+
+    .head h1 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.6px;
+      text-shadow: 0 0 10px rgba(103, 255, 143, 0.45);
+    }
+
+    .head p {
+      margin: 6px 0 0;
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+
+    .body {
+      padding: 16px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: inherit;
+      padding: 0 12px;
+      outline: none;
+      font-size: 0.92rem;
+    }
+
+    .input:focus {
+      border-color: #5df57e;
+      box-shadow: 0 0 0 1px rgba(93, 245, 126, 0.3);
+    }
+
+    .btn {
+      width: 100%;
+      height: 44px;
+      border: 1px solid #2f8f47;
+      border-radius: 9px;
+      background: linear-gradient(180deg, #11421d, #0b2c13);
+      color: #91ffac;
+      font-family: inherit;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .error {
+      margin-top: 12px;
+      border: 1px solid #5e2626;
+      background: rgba(60, 10, 10, 0.35);
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.86rem;
+    }
+
+    .foot {
+      margin-top: 12px;
+      color: var(--text-soft);
+      font-size: 0.86rem;
+    }
+
+    .foot a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px dashed #4bd16d;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 10px;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .google-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .google-note {
+      margin-top: 8px;
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
 <body>
+  <main class="screen">
+    <section class="card">
+      <header class="head">
+        <h1>ROOT AUTH :: LOGIN</h1>
+        <p>enter valid credentials to access terminal</p>
+      </header>
 
-<h2>Login</h2>
+      <div class="body">
+        <form method="POST">
+          {% csrf_token %}
 
-<form method="POST">
-    {% csrf_token %}
+          <div class="field">
+            <label class="label" for="username">Username</label>
+            <input id="username" class="input" type="text" name="username" placeholder="operator id" required>
+          </div>
 
-    <input type="text" name="username" placeholder="Username"><br><br>
-    <input type="password" name="password" placeholder="Password"><br><br>
+          <div class="field">
+            <label class="label" for="password">Password</label>
+            <input id="password" class="input" type="password" name="password" placeholder="access key" required>
+          </div>
 
-    <button type="submit">Login</button>
-</form>
+          <button class="btn" type="submit">initialize_session</button>
+        </form>
 
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
+        <div class="divider">or</div>
+        {% if google_client_id %}
+          <form id="googleAuthForm" method="POST" action="/auth/google/" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" id="idTokenInput" name="id_token">
+          </form>
+          <div class="google-wrap">
+            <div id="googleButton"></div>
+          </div>
+          <p class="google-note">continue with Google</p>
+        {% else %}
+          <p class="google-note">Google sign-in is not configured yet.</p>
+        {% endif %}
 
-<p>Don't have an account? 
-    <a href="/register/">Register here</a>
-</p>
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
 
+        <p class="foot">new operator? <a href="/register/">create account</a></p>
+      </div>
+    </section>
+  </main>
+  {% if google_client_id %}
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+      function handleGoogleCredentialResponse(response) {
+        const tokenInput = document.getElementById("idTokenInput");
+        const form = document.getElementById("googleAuthForm");
+        if (response && response.credential && tokenInput && form) {
+          tokenInput.value = response.credential;
+          form.submit();
+        }
+      }
+
+      window.addEventListener("load", function () {
+        if (window.google && google.accounts && google.accounts.id) {
+          google.accounts.id.initialize({
+            client_id: "{{ google_client_id }}",
+            callback: handleGoogleCredentialResponse
+          });
+
+          google.accounts.id.renderButton(
+            document.getElementById("googleButton"),
+            {
+              theme: "outline",
+              size: "large",
+              text: "continue_with",
+              shape: "pill",
+              width: 330
+            }
+          );
+        }
+      });
+    </script>
+  {% endif %}
 </body>
 </html>
