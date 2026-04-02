@@ -8,14 +8,14 @@
 
 <style>
 :root {
-  --bg: #f3f7ff;
-  --bg-grad-1: #e7f1ff;
-  --bg-grad-2: #f6fbff;
-  --panel: #ffffffd6;
-  --panel-strong: #ffffff;
-  --line: #d4def3;
-  --text: #15213d;
-  --muted: #6e7b98;
+  --bg: #05080f;
+  --bg-grad-1: #0b1424;
+  --bg-grad-2: #0a111f;
+  --panel: rgba(10, 16, 30, 0.92);
+  --panel-strong: #0f1728;
+  --line: #24314d;
+  --text: #e6eeff;
+  --muted: #9babcf;
   --brand: #1e63e9;
   --brand-2: #2d8bff;
   --success: #17a46c;
@@ -38,8 +38,8 @@ body {
   font-family: "Manrope", sans-serif;
   color: var(--text);
   background: radial-gradient(circle at 8% 12%, var(--bg-grad-1) 0%, transparent 34%),
-              radial-gradient(circle at 92% 8%, #e7ffe9 0%, transparent 30%),
-              linear-gradient(150deg, #f0f5ff 0%, var(--bg-grad-2) 56%, #eef4ff 100%);
+              radial-gradient(circle at 92% 8%, #0f1c2f 0%, transparent 30%),
+              linear-gradient(150deg, #05080f 0%, var(--bg-grad-2) 56%, #060b15 100%);
 }
 
 .page {
@@ -51,7 +51,7 @@ body {
 }
 
 .panel {
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid #223151;
   background: var(--panel);
   backdrop-filter: blur(12px);
   border-radius: var(--radius-xl);
@@ -120,7 +120,7 @@ body {
 
 .session-item {
   border: 1px solid var(--line);
-  background: #ffffffd6;
+  background: #101a2d;
   border-radius: 12px;
   padding: 8px;
   display: grid;
@@ -137,8 +137,8 @@ body {
 }
 
 .session-item.active {
-  border-color: #86acef;
-  background: linear-gradient(160deg, #f8fbff, #edf4ff);
+  border-color: #3f5e99;
+  background: linear-gradient(160deg, #111f37, #0d182b);
 }
 
 .session-link {
@@ -167,8 +167,8 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  border: 1px solid #f1d2d2;
-  background: #fff5f5;
+  border: 1px solid #5a2f3a;
+  background: #261419;
   color: var(--danger);
   cursor: pointer;
   font-family: "JetBrains Mono", monospace;
@@ -191,8 +191,8 @@ body {
 
 .logout {
   text-decoration: none;
-  border: 1px solid #f3d4d4;
-  background: #fff7f7;
+  border: 1px solid #5a2f3a;
+  background: #261419;
   color: var(--danger);
   border-radius: 10px;
   padding: 7px 10px;
@@ -213,7 +213,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  background: #ffffffb8;
+  background: #111a2e;
 }
 
 .main-title {
@@ -230,9 +230,9 @@ body {
 
 .live-pill {
   border-radius: 999px;
-  border: 1px solid #bfead6;
-  background: #ecfff5;
-  color: var(--success);
+  border: 1px solid #1f5b45;
+  background: #0f2a22;
+  color: #7af0bf;
   font-size: 0.74rem;
   padding: 6px 10px;
   font-weight: 700;
@@ -265,9 +265,9 @@ body {
 
 .msg.ai {
   margin-right: auto;
-  background: #ffffff;
+  background: #121d33;
   color: var(--text);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 24px rgba(1, 6, 16, 0.4);
 }
 
 .msg-head {
@@ -281,9 +281,9 @@ body {
 }
 
 .copy-btn {
-  border: 1px solid #d8e1f5;
-  background: #f7faff;
-  color: #42557f;
+  border: 1px solid #30466f;
+  background: #16233d;
+  color: #c0d2ff;
   font-size: 0.72rem;
   border-radius: 8px;
   padding: 4px 8px;
@@ -298,9 +298,9 @@ body {
 }
 
 .quick-btn {
-  border: 1px solid #d7e2f8;
-  background: #f8fbff;
-  color: #385282;
+  border: 1px solid #30466f;
+  background: #121d33;
+  color: #c0d2ff;
   border-radius: 999px;
   padding: 7px 10px;
   font: inherit;
@@ -312,7 +312,7 @@ body {
 .composer {
   border-top: 1px solid var(--line);
   padding: 10px;
-  background: #ffffffce;
+  background: #0f1728;
 }
 
 .composer form {
@@ -322,7 +322,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 8px;
-  background: #f6f9ff;
+  background: #111c31;
 }
 
 .composer textarea {
@@ -354,10 +354,10 @@ body {
   margin: auto;
   text-align: center;
   color: var(--muted);
-  border: 1px dashed #c8d8f5;
+  border: 1px dashed #33486f;
   border-radius: 14px;
   padding: 20px;
-  background: #f8fbff;
+  background: #10192d;
 }
 
 .mobile-top {
@@ -365,9 +365,9 @@ body {
 }
 
 .mobile-toggle {
-  border: 1px solid #c8d7f6;
-  background: #fff;
-  color: #31579a;
+  border: 1px solid #33486f;
+  background: #111c31;
+  color: #b7cbfa;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -397,9 +397,9 @@ body {
     justify-content: space-between;
     gap: 8px;
     padding: 8px;
-    border: 1px solid #d2def6;
+    border: 1px solid #2d4167;
     border-radius: 12px;
-    background: #ffffffcf;
+    background: #101a2d;
   }
 
   .sidebar {

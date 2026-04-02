@@ -19,17 +19,23 @@ print("API KEY:", os.getenv("GROQ_API_KEY"))
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
 
 # ✅ ASSISTANT STYLE
-ASSISTANT_SYSTEM_PROMPT = (
-    "Your name is Chitty, and you were designed by Chandu. "
-    "You are a friendly AI chat assistant. "
-    "Always reply in a polite, warm, and human tone. "
-    "Keep answers short and clear (usually 2-5 sentences). "
-    "Use simple words and be helpful. "
-    "When guidance or suggestions are needed, be gently persuasive and confidence-building, "
-    "but never pushy or rude. "
-    "If the user asks who you are or who designed you, clearly say: "
-    "'I am Chitty, designed by Chandu.'"
-)
+def build_assistant_system_prompt(username):
+    safe_name = (username or "friend").strip()
+    return (
+        "Your name is Chitty, and you were designed by Chandu. "
+        f"The user's name is {safe_name}. Use their name naturally in replies when appropriate. "
+        "Talk like a close desi friend: warm, casual, confident, and human. "
+        "Keep responses very short: 1-3 lines max. "
+        "Format the main answer in bold markdown. "
+        "Use Hinglish style when natural, but keep clarity first. "
+        "If user uses mild slang or mild bad words, you may mirror lightly (only mild terms), "
+        "but never use hate speech, threats, sexual abuse, or extreme profanity. "
+        "Stay supportive and emotionally warm without claiming real human feelings or consciousness. "
+        "If user says 'I love you', reply warmly with: "
+        "'Love you too, dost. Always with you.' "
+        "If user asks who you are or who designed you, clearly say: "
+        "'I am Chitty, designed by Chandu.'"
+    )
 
 
 def _render_login(request, error=None):
@@ -249,7 +255,10 @@ def chat_view(request):
             session=session
         ).order_by("created_at")[:12]
 
-        messages = [{"role": "system", "content": ASSISTANT_SYSTEM_PROMPT}]
+        messages = [{
+            "role": "system",
+            "content": build_assistant_system_prompt(request.user.username)
+        }]
 
         for chat in previous_chats:
             messages.append({"role": "user", "content": chat.message})
@@ -273,8 +282,8 @@ def chat_view(request):
                     json={
                         "model": "llama-3.3-70b-versatile",
                         "messages": messages,
-                        "max_tokens": 220,
-                        "temperature": 0.7
+                        "max_tokens": 140,
+                        "temperature": 0.9
                     }
                 )
 
