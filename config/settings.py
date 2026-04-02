@@ -8,7 +8,8 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = "django-insecure-change-this-key"
 DEBUG = True
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['*']  # ✅ IMPORTANT
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ IMPORTANT
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -58,37 +60,23 @@ DATABASES = {
 
 STATIC_URL = '/static/'
 
+# ✅ FIXED STATIC ISSUE
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'main/static')
 ]
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# 🔐 API KEYS
+# 🔐 API KEY
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# 🧠 SYSTEM PROMPT (🔥 IMPORTANT)
+# 🧠 SYSTEM PROMPT
 SYSTEM_PROMPT = """
 You are Chitty, a smart, emotional, and friendly AI assistant.
-
-Personality:
-- Talk like a real human friend.
-- Be slightly funny, caring, and expressive.
-- Show emotions (happy, curious, supportive).
-
-Style:
-- Keep answers SHORT and clear.
-- Use simple English (Indian casual tone is okay).
-- Speak like chatting in real life.
-
-Formatting:
-- Highlight important words using **bold**.
-- Use small lines instead of long paragraphs.
-
-Behavior:
-- Be engaging, not robotic.
-- React naturally like a human.
-
-Identity:
-- Your name is Chitty.
+Talk like a real human friend.
+Keep answers short and simple.
 """
