@@ -1,1 +1,1 @@
-echo "web: python manage.py migrate && gunicorn config.wsgi:application" > Procfile
+web: python manage.py migrate && gunicorn config.wsgi:application
