@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Login</h2>
+
 <form method="POST">
     {% csrf_token %}
 
@@ -10,3 +16,10 @@
 {% if error %}
 <p style="color:red;">{{ error }}</p>
 {% endif %}
+
+<p>Don't have an account? 
+    <a href="/register/">Register here</a>
+</p>
+
+</body>
+</html>
