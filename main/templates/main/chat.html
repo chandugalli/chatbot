@@ -304,6 +304,61 @@ body {
   background: rgba(7, 18, 10, 0.95);
 }
 
+.chat-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 38px;
+  height: 32px;
+  border: 1px solid #2f8c59;
+  border-radius: 8px;
+  background: rgba(9, 27, 15, 0.88);
+  color: var(--green);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+}
+
+.mobile-menu-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  border-color: #44bd78;
+}
+
+.mobile-menu-btn .line {
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--green);
+  display: block;
+  box-shadow: 0 0 8px rgba(79, 255, 170, 0.45);
+}
+
+.mobile-menu-btn .line + .line {
+  margin-top: 3px;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 9, 4, 0.56);
+  backdrop-filter: blur(2px);
+  z-index: 15;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
 .badge {
   border: 1px solid #2f8c59;
   border-radius: 999px;
@@ -531,31 +586,51 @@ body {
 
 @media (max-width: 930px) {
   body {
-    overflow: auto;
+    overflow: hidden;
   }
 
   .container {
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
+    height: 100vh;
     padding: 10px;
-    gap: 10px;
+    gap: 0;
   }
 
   .sidebar {
-    width: 100%;
-    min-height: 190px;
-    max-height: 260px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(290px, 82vw);
+    border-radius: 0 14px 14px 0;
+    border-left: none;
+    z-index: 20;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
   }
 
   .chat-area {
-    min-height: 72vh;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    flex-direction: column;
   }
 
   .user-msg,
   .ai-msg {
     max-width: 92%;
   }
+}
+
+body.menu-open {
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -574,9 +649,11 @@ body {
   <div class="noise"></div>
 </div>
 
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="container">
 
-  <div class="sidebar">
+  <div class="sidebar" id="mobileSidebar">
     <div class="brand">
       <h2>CHITTY@AI-TERMINAL</h2>
       <p>Chitty designed by Chandu</p>
@@ -606,7 +683,14 @@ body {
 
   <div class="chat-area">
     <div class="chat-head">
-      <span>Chitty terminal chat stream</span>
+      <div class="chat-head-left">
+        <button class="mobile-menu-btn" id="menuToggle" type="button" aria-label="Open menu">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </button>
+        <span>Chitty terminal chat stream</span>
+      </div>
       <span class="badge">LIVE</span>
     </div>
 
@@ -633,6 +717,52 @@ const chat = document.getElementById("chatBox");
 if (chat) {
   chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
 }
+
+const sidebar = document.getElementById("mobileSidebar");
+const overlay = document.getElementById("sidebarOverlay");
+const menuToggle = document.getElementById("menuToggle");
+
+function closeSidebar() {
+  if (!sidebar || !overlay) return;
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+  document.body.classList.remove("menu-open");
+}
+
+function openSidebar() {
+  if (!sidebar || !overlay) return;
+  sidebar.classList.add("open");
+  overlay.classList.add("show");
+  document.body.classList.add("menu-open");
+}
+
+if (menuToggle) {
+  menuToggle.addEventListener("click", function () {
+    if (sidebar && sidebar.classList.contains("open")) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  });
+}
+
+if (overlay) {
+  overlay.addEventListener("click", closeSidebar);
+}
+
+document.querySelectorAll(".sidebar a").forEach(function (link) {
+  link.addEventListener("click", function () {
+    if (window.innerWidth <= 930) {
+      closeSidebar();
+    }
+  });
+});
+
+window.addEventListener("resize", function () {
+  if (window.innerWidth > 930) {
+    closeSidebar();
+  }
+});
 </script>
 
 {% endblock %}

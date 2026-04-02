@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from .models import ChatSession, Conversation
 import requests
 import os
@@ -66,10 +68,24 @@ def _unique_username(raw_value):
 # ✅ LOGIN
 def login_view(request):
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        credential = (request.POST.get('username') or "").strip()
+        password = request.POST.get('password') or ""
 
-        user = authenticate(request, username=username, password=password)
+        if not credential or not password:
+            return _render_login(request, "Username/email and password are required.")
+
+        username_for_auth = credential
+        if "@" in credential:
+            same_email_users = User.objects.filter(email__iexact=credential)
+            if same_email_users.count() > 1:
+                return _render_login(
+                    request,
+                    "This email is linked to multiple accounts. Please contact support."
+                )
+            if same_email_users.exists():
+                username_for_auth = same_email_users.first().username
+
+        user = authenticate(request, username=username_for_auth, password=password)
 
         if user:
             login(request, user)
@@ -115,6 +131,16 @@ def register_page(request):
             return _render_register(
                 request,
                 "Email is required",
+                old_username=username,
+                old_email=email,
+            )
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            return _render_register(
+                request,
+                "Enter a valid email address",
                 old_username=username,
                 old_email=email,
             )
@@ -178,7 +204,14 @@ def google_auth_view(request):
             "Google account email is missing or not verified."
         )
 
-    user = User.objects.filter(email__iexact=email).first()
+    same_email_users = User.objects.filter(email__iexact=email)
+    if same_email_users.count() > 1:
+        return _render_login(
+            request,
+            "This email is linked to multiple accounts. Please contact support."
+        )
+
+    user = same_email_users.first()
     if not user:
         base_name = token_data.get("name") or email.split("@")[0]
         username = _unique_username(base_name)
