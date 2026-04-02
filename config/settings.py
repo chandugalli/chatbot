@@ -9,7 +9,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-# ✅ CSRF FIX
 CSRF_TRUSTED_ORIGINS = [
     "https://chatbot-production-9718.up.railway.app"
 ]
@@ -31,8 +30,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-    # ✅ whitenoise
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -48,21 +45,17 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',  # IMPORTANT
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 DATABASES = {
     'default': {
@@ -73,5 +66,3 @@ DATABASES = {
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
