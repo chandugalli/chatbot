@@ -2,11 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from .models import Conversation
 import requests
 import os
-
-# temporary chat storage
-chat_history = []
 
 
 # ✅ LOGIN
@@ -47,11 +45,9 @@ def register_page(request):
     return render(request, 'main/register.html')
 
 
-# ✅ CHAT / SEARCH PAGE (GROQ AI FINAL)
+# ✅ CHAT (SAVE + FETCH FROM DB)
 @login_required
 def search_page(request):
-    global chat_history
-
     if request.method == "POST":
         user_input = request.POST.get('query')
 
@@ -82,13 +78,18 @@ def search_page(request):
         except Exception as e:
             ai_response = f"Error: {str(e)}"
 
-        chat_history.append({
-            "message": user_input,
-            "response": ai_response
-        })
+        # 🔥 SAVE TO DATABASE
+        Conversation.objects.create(
+            user=request.user,
+            message=user_input,
+            response=ai_response
+        )
+
+    # 🔥 FETCH FROM DATABASE
+    chats = Conversation.objects.filter(user=request.user).order_by("created_at")
 
     return render(request, 'main/search.html', {
-        "chats": chat_history
+        "chats": chats
     })
 
 
