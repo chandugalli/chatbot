@@ -131,12 +131,37 @@
       margin-top: 12px;
       color: var(--text-soft);
       font-size: 0.86rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
     }
 
     .foot a {
       color: var(--text);
       text-decoration: none;
       border-bottom: 1px dashed #4bd16d;
+    }
+
+    .create-account-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid #2f8f47;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: linear-gradient(180deg, rgba(17, 66, 29, 0.95), rgba(11, 44, 19, 0.95));
+      color: #a0ffba !important;
+      border-bottom: none !important;
+      box-shadow: 0 0 0 1px rgba(80, 220, 116, 0.2), 0 0 16px rgba(62, 210, 113, 0.22);
+      transition: transform 0.16s ease, filter 0.2s ease, box-shadow 0.2s ease;
+      animation: ctaPulse 2.2s ease-in-out infinite;
+    }
+
+    .create-account-link:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 0 0 1px rgba(80, 220, 116, 0.35), 0 0 20px rgba(62, 210, 113, 0.3);
     }
 
     .divider {
@@ -169,6 +194,16 @@
       text-align: center;
       color: var(--text-soft);
       font-size: 0.78rem;
+    }
+
+    @keyframes ctaPulse {
+      0%,
+      100% {
+        filter: brightness(1);
+      }
+      50% {
+        filter: brightness(1.08);
+      }
     }
   </style>
 </head>
@@ -215,7 +250,10 @@
           <div class="error">{{ error }}</div>
         {% endif %}
 
-        <p class="foot">new operator? <a href="/register/">create account</a></p>
+        <p class="foot">
+          <span>new operator?</span>
+          <a href="/register/" class="create-account-link">Create Account</a>
+        </p>
       </div>
     </section>
   </main>

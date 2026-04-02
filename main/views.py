@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.db.models import Max
 from .models import ChatSession, Conversation
 import requests
 import os
@@ -230,19 +231,23 @@ def google_auth_view(request):
 def chat_view(request):
     session_id = request.GET.get('session')
 
-    # get or create session
+    # get active session
     if session_id:
-        session = ChatSession.objects.get(id=session_id, user=request.user)
+        session = get_object_or_404(ChatSession, id=session_id, user=request.user)
     else:
-        session = ChatSession.objects.create(user=request.user)
+        session = ChatSession.objects.filter(user=request.user).order_by("-created_at").first()
+        if not session:
+            session = ChatSession.objects.create(user=request.user)
 
     if request.method == "POST":
-        user_input = request.POST.get('query')
+        user_input = (request.POST.get('query') or "").strip()
+        if not user_input:
+            return redirect(f"/chat/?session={session.id}")
 
         # 🔥 MEMORY (last 10 messages)
         previous_chats = Conversation.objects.filter(
             session=session
-        ).order_by("created_at")[:10]
+        ).order_by("created_at")[:12]
 
         messages = [{"role": "system", "content": ASSISTANT_SYSTEM_PROMPT}]
 
@@ -296,24 +301,46 @@ def chat_view(request):
 
         # ✅ SET CHAT TITLE
         if session.title == "New Chat":
-            session.title = user_input[:30]
+            session.title = user_input[:45]
             session.save()
 
         return redirect(f"/chat/?session={session.id}")
 
     # fetch chats
-    chats = Conversation.objects.filter(session=session)
+    chats = Conversation.objects.filter(session=session).order_by("created_at")
 
     # fetch history
     sessions = ChatSession.objects.filter(
         user=request.user
-    ).order_by("-created_at")
+    ).annotate(
+        last_message_at=Max("conversation__created_at")
+    ).order_by("-last_message_at", "-created_at")
 
     return render(request, "main/chat.html", {
         "chats": chats,
         "sessions": sessions,
         "current_session": session
     })
+
+
+@login_required
+def new_chat_view(request):
+    session = ChatSession.objects.create(user=request.user)
+    return redirect(f"/chat/?session={session.id}")
+
+
+@login_required
+def delete_session_view(request, session_id):
+    if request.method != "POST":
+        return redirect("chat")
+
+    session = get_object_or_404(ChatSession, id=session_id, user=request.user)
+    session.delete()
+
+    fallback = ChatSession.objects.filter(user=request.user).order_by("-created_at").first()
+    if fallback:
+        return redirect(f"/chat/?session={fallback.id}")
+    return redirect("new_chat")
 
 
 # ✅ LOGOUT
