@@ -1,82 +1,77 @@
-from pathlib import Path
 import os
-from dotenv import load_dotenv
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(os.path.join(BASE_DIR, ".env"))
+SECRET_KEY = 'your-secret-key'
 
-SECRET_KEY = "django-insecure-change-this-key"
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # ✅ IMPORTANT
+ALLOWED_HOSTS = ['*']
+
+# ✅ CSRF FIX
+CSRF_TRUSTED_ORIGINS = [
+    "https://chatbot-production-9718.up.railway.app"
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "main",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'main',
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ IMPORTANT
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.middleware.security.SecurityMiddleware',
+
+    # ✅ whitenoise
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
-ROOT_URLCONF = "config.urls"
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',  # IMPORTANT
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = 'config.wsgi.application'
+
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
 STATIC_URL = '/static/'
-
-# ✅ FIXED STATIC ISSUE
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'main/static')
-]
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# 🔐 API KEY
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-# 🧠 SYSTEM PROMPT
-SYSTEM_PROMPT = """
-You are Chitty, a smart, emotional, and friendly AI assistant.
-Talk like a real human friend.
-Keep answers short and simple.
-"""
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
