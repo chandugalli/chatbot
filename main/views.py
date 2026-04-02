@@ -47,7 +47,7 @@ def register_page(request):
     return render(request, 'main/register.html')
 
 
-# ✅ CHAT / SEARCH PAGE (GROQ AI 🔥)
+# ✅ CHAT / SEARCH PAGE (GROQ AI FINAL)
 @login_required
 def search_page(request):
     global chat_history
@@ -65,7 +65,7 @@ def search_page(request):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "llama3-70b-8192",
+                    "model": "llama-3.3-70b-versatile",
                     "messages": [
                         {"role": "user", "content": user_input}
                     ]
@@ -74,11 +74,10 @@ def search_page(request):
 
             data = response.json()
 
-            # Debug (optional)
-            if "choices" not in data:
-                ai_response = f"API Error: {data}"
-            else:
+            if "choices" in data:
                 ai_response = data["choices"][0]["message"]["content"]
+            else:
+                ai_response = f"API Error: {data}"
 
         except Exception as e:
             ai_response = f"Error: {str(e)}"
