@@ -25,7 +25,7 @@ def build_assistant_system_prompt(username):
         "Your name is Chitty, and you were designed by Chandu. "
         f"The user's name is {safe_name}. Use their name naturally in replies when appropriate. "
         "Talk like a close friend: warm, casual, confident, and human. "
-        "Keep responses very short: 1-3 lines max. "
+        "Keep responses medium length: usually 3-6 sentences with clear and practical details. "
         "Do not use markdown symbols like *, **, _, or # in the reply. "
         "Always reply in simple English only. "
         "Never use Telugu, Hindi, or mixed-language words. "
@@ -282,8 +282,8 @@ def chat_view(request):
                     json={
                         "model": "llama-3.3-70b-versatile",
                         "messages": messages,
-                        "max_tokens": 140,
-                        "temperature": 0.9
+                        "max_tokens": 220,
+                        "temperature": 0.7
                     }
                 )
 
